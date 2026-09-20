@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F2EDE1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0D1524" media="(prefers-color-scheme: dark)" />
+
+    <title>The Midnight Ledger — three archives, one reconstructed life</title>
+    <meta
+      name="description"
+      content="162,588 digital receipts from three anonymous archives — eleven years of listening, four years of household spending, and ten thousand strangers. An illustrated field journal that asks whether they belong to one person."
+    />
+    <meta name="author" content="The Midnight Ledger" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The Midnight Ledger" />
+    <meta
+      property="og:description"
+      content="An illustrated field journal reconstructing one life from 162,588 digital receipts."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Serif:ital@0;1&display=swap"
+    />
+    <link rel="preload" as="fetch" href="/data/overview.json" crossorigin />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="padding: 2rem; font-family: Georgia, serif; max-width: 40rem; margin: 0 auto">
+        <h1>The Midnight Ledger</h1>
+        <p>
+          This is an interactive reconstruction of three anonymous data archives — 149,860 listening
+          events, 2,461 household transactions and 10,267 card payments. It needs JavaScript to draw
+          its charts and trace connections between records. Please enable JavaScript and reload.
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

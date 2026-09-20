@@ -1,0 +1,88 @@
+/**
+ * Design tokens — the whole visual world in one place.
+ *
+ * The brief is a cartographer's field journal: laid paper, navy ink, a single
+ * bright azure for anything the reader can act on, ochre reserved for the sun
+ * and for peaks. Nothing else gets a colour.
+ *
+ * Dark mode is not an inversion. It is the same journal read at 2am: the paper
+ * becomes the night sky the subject was listening into, and the ink becomes the
+ * lamp. Both schemes are designed, neither is a fallback.
+ */
+
+@theme {
+  /* ── Surfaces ──────────────────────────────────────────────────────────── */
+  --color-paper: #f2ede1;
+  --color-paper-2: #e9e0cd;
+  --color-paper-3: #ddd1b8;
+
+  /* ── Ink ───────────────────────────────────────────────────────────────── */
+  --color-ink: #15223b;
+  --color-ink-2: #45547a;
+  --color-ink-3: #7b87a3;
+
+  /* ── Accents ───────────────────────────────────────────────────────────── */
+  --color-azure: #1c5fd0;
+  --color-ochre: #d99a2b;
+  --color-rust: #b94a26;
+  --color-moss: #47755a;
+
+  /* ── Type ──────────────────────────────────────────────────────────────── */
+  --font-display: "Anton", "Arial Narrow", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-nano: 0.6875rem;
+  --text-micro: 0.75rem;
+  --text-label: 0.8125rem;
+  --text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lead: clamp(1.25rem, 1.05rem + 0.9vw, 1.75rem);
+  --text-h3: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+  --text-h2: clamp(2.25rem, 1.5rem + 3.4vw, 4.5rem);
+  --text-h1: clamp(3.25rem, 1rem + 11vw, 11rem);
+
+  /* ── Rhythm ────────────────────────────────────────────────────────────── */
+  --space-gutter: clamp(1.25rem, 0.8rem + 2.2vw, 4rem);
+  --space-section: clamp(5rem, 3rem + 9vw, 11rem);
+
+  /* ── Motion ────────────────────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-draw: cubic-bezier(0.33, 0.9, 0.2, 1);
+  --duration-fast: 180ms;
+  --duration-normal: 520ms;
+  --duration-slow: 1100ms;
+  --duration-draw: 1800ms;
+}
+
+/* ── Dark scheme ─────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: #0c1322;
+    --color-paper-2: #131d31;
+    --color-paper-3: #1e2a43;
+
+    --color-ink: #efe8d8;
+    --color-ink-2: #a9b4ca;
+    --color-ink-3: #74809a;
+
+    --color-azure: #5f9bf7;
+    --color-ochre: #f0bc5e;
+    --color-rust: #e0754c;
+    --color-moss: #74b48e;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-paper: #0c1322;
+  --color-paper-2: #131d31;
+  --color-paper-3: #1e2a43;
+
+  --color-ink: #efe8d8;
+  --color-ink-2: #a9b4ca;
+  --color-ink-3: #74809a;
+
+  --color-azure: #5f9bf7;
+  --color-ochre: #f0bc5e;
+  --color-rust: #e0754c;
+  --color-moss: #74b48e;
+}

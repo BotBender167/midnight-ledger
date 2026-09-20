@@ -1,0 +1,214 @@
+/**
+ * Motion primitives.
+ *
+ * Every animation here runs on `transform`, `opacity`, `stroke-dashoffset` or
+ * `clip-path` only — the four things the compositor can handle without a
+ * layout pass. Nothing animates width, height, top or margin, which is what
+ * keeps long scrolls at 60fps on a phone.
+ *
+ * Elements are authored in their *finished* state and pushed back into their
+ * start state by `[data-enter="false"]`. If the IntersectionObserver never
+ * runs — script error, ancient browser, reduced-motion — the page is simply
+ * already correct. Motion is decoration, never a prerequisite for content.
+ */
+
+/* ── Enter: rise and fade ────────────────────────────────────────────────── */
+[data-enter] {
+  transition:
+    opacity var(--duration-normal) var(--ease-out-expo),
+    transform var(--duration-normal) var(--ease-out-expo);
+  transition-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+[data-enter="false"] {
+  opacity: 0;
+  transform: translate3d(0, 1.75rem, 0);
+}
+
+[data-enter="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Enter variants ──────────────────────────────────────────────────────── */
+[data-enter="false"][data-enter-from="left"] {
+  transform: translate3d(-2.5rem, 0, 0);
+}
+[data-enter="false"][data-enter-from="right"] {
+  transform: translate3d(2.5rem, 0, 0);
+}
+[data-enter="false"][data-enter-from="scale"] {
+  transform: scale(0.94);
+}
+[data-enter="false"][data-enter-from="none"] {
+  transform: none;
+}
+
+/* ── Draw: ink laid down by an invisible pen ─────────────────────────────── */
+/* Every drawn path carries `pathLength="1"`, so one dasharray value works for
+   a 40px tick and a 2000px coastline alike — no per-path length measuring. */
+.ink-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--duration-draw) var(--ease-draw);
+  transition-delay: calc(var(--stagger, 0) * 110ms);
+}
+
+[data-enter="false"] .ink-draw,
+.ink-draw[data-enter="false"] {
+  stroke-dashoffset: 1;
+}
+
+/* ── Wash: fills arriving after their outline ────────────────────────────── */
+.ink-wash {
+  transition:
+    opacity var(--duration-slow) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+  transition-delay: calc(360ms + var(--stagger, 0) * 90ms);
+  transform-origin: center bottom;
+}
+
+[data-enter="false"] .ink-wash {
+  opacity: 0;
+  transform: scaleY(0.82);
+}
+
+/* ── Ambient loops: only run once their scene has arrived ────────────────── */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -0.5rem, 0);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.1deg);
+  }
+  50% {
+    transform: rotate(1.1deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -1.5rem, 0) rotate(-6deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(1.5rem, 7rem, 0) rotate(10deg);
+  }
+}
+
+@keyframes walk {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -0.14rem, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* Loops attach only inside a scene that has entered, so nothing animates
+   off-screen and burns battery. */
+[data-enter="true"] .anim-drift {
+  animation: drift 7s var(--ease-out-expo) infinite;
+}
+[data-enter="true"] .anim-sway {
+  animation: sway 9s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+[data-enter="true"] .anim-twinkle {
+  animation: twinkle 3.4s ease-in-out infinite;
+  animation-delay: calc(var(--stagger, 0) * 420ms);
+}
+[data-enter="true"] .anim-orbit {
+  animation: orbit 90s linear infinite;
+  transform-origin: center;
+}
+[data-enter="true"] .anim-fall {
+  animation: fall 9s linear infinite;
+  animation-delay: calc(var(--stagger, 0) * 1.6s);
+}
+[data-enter="true"] .anim-walk {
+  animation: walk 0.9s steps(2, end) infinite;
+}
+[data-enter="true"] .anim-ring {
+  animation: pulse-ring 2.6s var(--ease-out-expo) infinite;
+  transform-origin: center;
+}
+
+/* ── Reduced motion: show the finished state, cut the movement ───────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-enter="false"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-enter="false"] .ink-draw,
+  .ink-draw[data-enter="false"] {
+    stroke-dashoffset: 0;
+  }
+
+  [data-enter="false"] .ink-wash {
+    opacity: 1;
+    transform: none;
+  }
+}
