@@ -62,6 +62,10 @@ export const KIND_LABEL: Record<string, string> = {
   binge: "Lost day",
   return: "Return",
   purchase: "Purchase",
+  place: "Journey",
+  event: "Occasion",
+  entertainment: "Watched",
+  note: "Written note",
   ritual: "Recurring",
   investment: "Put away",
   income: "Received",
@@ -75,7 +79,30 @@ export const KIND_COLOR: Record<string, string> = {
   binge: "var(--color-ochre)",
   return: "var(--color-moss)",
   purchase: "var(--color-ink)",
+  place: "var(--color-moss)",
+  event: "var(--color-rust)",
+  entertainment: "var(--color-azure)",
+  note: "var(--color-ink-2)",
   ritual: "var(--color-moss)",
   investment: "var(--color-azure)",
   income: "var(--color-ochre)",
 };
+
+/**
+ * The nine receipt types the brief named, against what the data actually holds.
+ *
+ * Shown in the interface rather than quietly omitted: three of the nine have no
+ * corresponding records in the supplied archives, and inventing them would have
+ * meant fabricating a life rather than reading one.
+ */
+export const BRIEF_TAXONOMY: Array<{ brief: string; kinds: string[]; note: string }> = [
+  { brief: "Music", kinds: ["discovery", "obsession", "vigil", "binge", "return"], note: "149,860 plays" },
+  { brief: "Purchases", kinds: ["purchase", "ritual", "investment", "income"], note: "the household ledger" },
+  { brief: "Places", kinds: ["place"], note: "journeys between anonymised places" },
+  { brief: "Events", kinds: ["event"], note: "festivals and occasions" },
+  { brief: "Movies & entertainment", kinds: ["entertainment"], note: "subscriptions and what was watched" },
+  { brief: "Personal notes", kinds: ["note"], note: "the ledger's free-text field" },
+  { brief: "Photos", kinds: [], note: "no records in the supplied data" },
+  { brief: "Messages", kinds: [], note: "no records in the supplied data" },
+  { brief: "Searches", kinds: [], note: "no records in the supplied data" },
+];

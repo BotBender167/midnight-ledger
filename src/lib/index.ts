@@ -13,3 +13,5 @@ export {
   KIND_LABEL,
   KIND_COLOR,
 } from "./format";
+export { toCSV, downloadCSV } from "./exportReceipts";
+export { BRIEF_TAXONOMY } from "./format";

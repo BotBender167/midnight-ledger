@@ -53,12 +53,31 @@ The brief set six minimum requirements. Each maps to a specific module:
 
 | Requirement | Implementation | File |
 |---|---|---|
-| A way to explore the receipts | Searchable, filterable archive of all 3,704 shipped receipts | [`src/sections/Archive.tsx`](src/sections/Archive.tsx) |
-| Meaningful filtering, searching, navigation | Free-text search across title/subtitle/detail/tags, 9 receipt-kind filters, year filter, sticky section nav with scroll-spy | [`Archive.tsx`](src/sections/Archive.tsx), [`Masthead.tsx`](src/components/Masthead.tsx) |
+| A way to explore the receipts | Searchable, filterable, sortable archive of all 3,704 shipped receipts, exportable as CSV | [`src/sections/Archive.tsx`](src/sections/Archive.tsx) |
+| Meaningful filtering, searching, navigation | Free-text search across title/subtitle/detail/tags, 13 receipt-kind filters in 3 groups, year filter, 4 sort orders — **all synced to the query string**, so any view is a shareable link and the back button undoes a filter. Sticky section nav with scroll-spy, reading-progress bar | [`Archive.tsx`](src/sections/Archive.tsx), [`useUrlState.ts`](src/hooks/useUrlState.ts), [`Masthead.tsx`](src/components/Masthead.tsx) |
 | **≥1 mechanism for discovering relationships** | **The connection engine** — scores every record against an anchor on proximity, shared vocabulary and cross-archive crossing; any node re-anchors the graph | [`src/lib/connections.ts`](src/lib/connections.ts), [`Constellation.tsx`](src/sections/Constellation.tsx) |
 | An interactive storytelling experience | Eight scroll-driven plates, six auto-detected chapters, and a timezone dial that rewrites the subject's personality live | [`src/sections/`](src/sections/) |
 | A clear visual of the digital journey | Radial 24-hour clock, per-chapter hour fingerprints, dual-series convergence chart, crowd-vs-subject overlay | [`src/components/viz/`](src/components/viz/) |
 | Responsive design | Fluid type and spacing via `clamp()`, single-column → 4-column grids, tested 320 / 375 / 768 / 1024 / 1440 | [`src/styles/tokens.css`](src/styles/tokens.css) |
+
+### The nine receipt types
+
+The brief named nine kinds of receipt. **Six are genuinely in the data** and are extracted rather
+than invented; three are simply absent, and the interface says so rather than quietly omitting them.
+
+| Brief's type | In the data | Records | Source |
+|---|:--:|--:|---|
+| Music | ✅ | 1,243 | 149,860 plays reduced to moments |
+| Purchases | ✅ | 1,921 | the household ledger |
+| Places | ✅ | 266 | journeys parsed out of transport notes — `"2 Place 5 to Place 0"` |
+| Personal notes | ✅ | 209 | ledger rows whose note is a sentence, not a label |
+| Movies & entertainment | ✅ | 37 | Netflix, Tata Play, Prime subscriptions |
+| Events | ✅ | 28 | festivals and occasions — Ganesh Pujan, Rakshabandhan |
+| Photos | ❌ | — | no records in the supplied data |
+| Messages | ❌ | — | no records in the supplied data |
+| Searches | ❌ | — | no records in the supplied data |
+
+That table is rendered in the archive itself, counts and all, computed at runtime.
 
 ### The two features worth looking at
 
@@ -167,15 +186,23 @@ would mean writing one adapter and changing nothing else.
 
 | Chunk | Raw | Gzipped |
 |---|---:|---:|
-| Application code | 28.1 KB | **10.2 KB** |
+| Application code | 66.2 KB | **19.5 KB** |
 | React vendor (cached across deploys) | 221.7 KB | 68.9 KB |
-| CSS | 32.6 KB | 7.3 KB |
-| 7 lazy section chunks | 4–7 KB each | 1.5–2.7 KB each |
+| CSS | 33.6 KB | 7.4 KB |
 
-- **Six of the eight plates are code-split.** Only the hero and the inventory are in the entry
-  bundle; the rest load behind `Suspense` with height-reserving fallbacks, so nothing shifts.
-- **`content-visibility: auto` on every plate**, so the browser skips layout and paint for
-  sections nowhere near the viewport. On a 30,000px page this is the single biggest win.
+**Two optimisations were tried and deliberately reverted**, because both bought speed with
+content availability:
+
+- *Lazy-loading six of the eight plates* cut the entry chunk to 10.2 KB, but meant most of the
+  document did not exist until the reader scrolled. In-page anchors pointed at unmounted
+  sections, Ctrl+F found nothing, and anything reading the page — a screen reader taking an
+  overview, a crawler — saw two sections and six placeholders.
+- *`content-visibility: auto` on every plate* skipped layout and paint for offscreen sections,
+  but skipped subtrees are excluded from rendering, so `innerText` returns empty for them.
+
+For a page that is one continuous scrolled essay, whole-document availability beats a smaller
+first chunk. What remains are the optimisations that cost nothing:
+
 - **No animation library.** All motion is CSS `transform` / `opacity` / `stroke-dashoffset`,
   which stays on the compositor. A scroll observer sets one attribute; CSS does the rest.
 - **No charting library.** Every figure is hand-authored inline SVG, so it inherits

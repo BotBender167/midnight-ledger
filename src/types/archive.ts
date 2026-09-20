@@ -19,12 +19,18 @@ export type Source = "listening" | "ledger";
  * silence all are. Ledger moments map straight from the source rows.
  */
 export type ReceiptKind =
+  // Derived from the listening archive
   | "discovery"
   | "obsession"
   | "vigil"
   | "binge"
   | "return"
+  // Read from the household ledger
   | "purchase"
+  | "place"
+  | "event"
+  | "entertainment"
+  | "note"
   | "ritual"
   | "investment"
   | "income";

@@ -10,21 +10,60 @@
  * the layout changes.
  */
 
-/* ── Offscreen work the browser can skip ─────────────────────────────────── */
-/* Each plate is a full screen of SVG and text. `content-visibility` lets the
-   browser skip layout and paint for the ones not near the viewport, which is
-   the single biggest win on a 30,000px page. `contain-intrinsic-size` supplies
-   a placeholder height so the scrollbar does not lurch as they resolve. */
-.section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 720px;
+/* ── Why there is no containment here ────────────────────────────────────── */
+/* `content-visibility: auto` was applied to every plate and removed
+   deliberately. Skipped subtrees are excluded from rendering, so `innerText`
+   returns empty for them — in-page find, text extraction and anything else
+   reading rendered text sees an empty document below the fold. On a page that
+   is one continuous essay, that is a bad trade for a paint saving.
+   `contain: paint` is also unusable: the constellation graph overflows its
+   viewBox on purpose and would be clipped. Performance is bought instead
+   through the vendor chunk split, memoisation and compositor-only animation,
+   none of which cost content availability. */
+
+/* ── Replaced elements never exceed their column ─────────────────────────── */
+/* One rule that prevents the most common source of mobile horizontal scroll:
+   an image or figure wider than the space it was given. */
+img,
+svg,
+video,
+canvas,
+iframe,
+table {
+  max-width: 100%;
+  height: auto;
 }
 
-/* The first two plates are always visible on load; skipping them would only
-   cost a paint. */
-header .section,
-#dig {
-  content-visibility: visible;
+/* Long unbroken strings — an artist name, a merchant, a URL — must wrap rather
+   than push the layout wider than the screen. */
+h1,
+h2,
+h3,
+p,
+li,
+dd,
+dt {
+  overflow-wrap: break-word;
+}
+
+/* ── Mobile first: base is the phone, each step adds room ────────────────── */
+/* Small phones get the tightest gutter; everything above progressively relaxes. */
+@media (min-width: 30rem) {
+  .section {
+    padding-block: clamp(4rem, 2.5rem + 6vw, 6rem);
+  }
+}
+
+@media (min-width: 48rem) {
+  .slip {
+    padding: 0.95rem 1.1rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .section {
+    padding-block: var(--space-section);
+  }
 }
 
 /* ── Container queries: slips respond to their column, not the viewport ──── */
