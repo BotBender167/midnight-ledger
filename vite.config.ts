@@ -15,9 +15,14 @@ export default defineConfig({
     cssMinify: "lightningcss",
     rollupOptions: {
       output: {
-        // React is stable across deploys; splitting it keeps the app chunk
-        // small and independently cacheable.
-        manualChunks: { react: ["react", "react-dom"] },
+        // React is stable across deploys, so splitting it keeps the app chunk
+        // small and lets the vendor chunk stay cached across releases.
+        // `react-dom/client` must be listed explicitly: it is the entry the app
+        // actually imports, and without it the bulk of react-dom lands in the
+        // application chunk and is re-downloaded on every deploy.
+        manualChunks: {
+          react: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
+        },
       },
     },
   },

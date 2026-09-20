@@ -21,16 +21,14 @@ import type { Receipt } from "../types/archive";
  * corpus; everything else is tuning that lives in here.
  */
 
-/** Default half-width of the search window, in days. */
-const DEFAULT_WINDOW_DAYS = 3;
-/** How many links to return. More than this reads as noise, not a story. */
-const DEFAULT_LIMIT = 12;
-
-/** Axis weights. They sum to 1 so `score` stays readable as a percentage. */
-const WEIGHT = { proximity: 0.5, resonance: 0.3, crossing: 0.2 } as const;
-
-/** Tags that are structural rather than descriptive and so prove nothing. */
-const GENERIC_TAGS = new Set(["music", "money"]);
+import {
+  CONNECTION_WEIGHTS as WEIGHT,
+  DAY_MS,
+  DEFAULT_CONNECTION_LIMIT as DEFAULT_LIMIT,
+  DEFAULT_WINDOW_DAYS,
+  GENERIC_TAGS,
+  WEAK_LINK_PROXIMITY_FLOOR,
+} from "../constants/analysis";
 
 export interface Connection {
   receipt: Receipt;
@@ -122,7 +120,7 @@ export function findConnections(
   const anchorTime = toTime(anchor.ts);
   if (Number.isNaN(anchorTime)) return [];
 
-  const windowMs = windowDays * 86_400_000;
+  const windowMs = windowDays * DAY_MS;
   const anchorTags = significantTags(anchor);
 
   const links: Connection[] = [];
@@ -158,9 +156,9 @@ export function findConnections(
       (crossesArchives ? WEIGHT.crossing : 0);
 
     // A same-archive link with nothing in common but the clock is not a finding.
-    if (!crossesArchives && shared.length === 0 && proximity < 0.72) continue;
+    if (!crossesArchives && shared.length === 0 && proximity < WEAK_LINK_PROXIMITY_FLOOR) continue;
 
-    const dayOffset = Math.round(delta / 86_400_000);
+    const dayOffset = Math.round(delta / DAY_MS);
 
     links.push({
       receipt: candidate,

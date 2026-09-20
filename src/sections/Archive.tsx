@@ -4,8 +4,7 @@ import { Reveal } from "../components/Reveal";
 import type { Receipt, ReceiptKind } from "../types/archive";
 import { KIND_LABEL, num } from "../lib/format";
 
-/** Results rendered at once. The rest are reachable by narrowing or paging. */
-const PAGE = 60;
+import { ARCHIVE_PAGE_SIZE as PAGE } from "../constants/ui";
 
 const KIND_GROUPS: Array<{ label: string; kinds: ReceiptKind[] }> = [
   { label: "Listening", kinds: ["discovery", "obsession", "vigil", "binge", "return"] },
@@ -185,7 +184,7 @@ export function Archive({ receipts, isLoading, years }: Props) {
           </p>
         ) : (
           <>
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ul className="slip-grid mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {results.slice(0, limit).map((receipt) => (
                 <li key={receipt.id}>
                   <ReceiptSlip receipt={receipt} />

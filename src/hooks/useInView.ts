@@ -19,10 +19,9 @@ import { useEffect, useRef, useState } from "react";
  * declared broken and everything is revealed at once. Normal browsers fire on
  * the frame after `observe()`, so the healthy path is never delayed.
  */
-type Callback = (entry: IntersectionObserverEntry) => void;
+import { OBSERVER_HEALTH_GRACE_MS as HEALTH_GRACE_MS } from "../constants/ui";
 
-/** How long to wait for any observer callback before assuming none will come. */
-const HEALTH_GRACE_MS = 1200;
+type Callback = (entry: IntersectionObserverEntry) => void;
 
 type Pool = { observer: IntersectionObserver; callbacks: Map<Element, Callback> };
 

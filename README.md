@@ -144,12 +144,18 @@ scripts/           build-time: CSV → JSON, runs on Node, zero dependencies
 
 src/
   types/archive.ts   the domain model — three sources flattened to one Receipt shape
-  lib/               pure logic: connection scoring, formatting. No React.
-  hooks/             data loading, pooled scroll observation
-  components/        primitives, art, viz
-  sections/          one file per plate
-  styles/            tokens and motion, separated from component code
+  constants/         every tuning number: scoring weights, windows, breakpoints
+  lib/               pure logic: connection scoring, formatting. No React. Tested.
+  hooks/             data loading, pooled scroll observation, theme access
+  context/           ThemeProvider — colour scheme for the document
+  components/        primitives, art/ illustration, viz/ figures
+  sections/          one file per plate; six are lazy-loaded
+  styles/            tokens, motion and responsive rules, separate from components
+
+docs/adr/            why the three load-bearing decisions were made
 ```
+
+Each of `lib`, `hooks`, `components` and `constants` has a barrel `index.ts`.
 
 **The shape that matters:** three very different sources are normalised to one `Receipt` type
 *before* any UI sees them. Every downstream view reads only that shape, so a fourth archive
@@ -159,15 +165,42 @@ would mean writing one adapter and changing nothing else.
 
 ## Performance
 
+| Chunk | Raw | Gzipped |
+|---|---:|---:|
+| Application code | 28.1 KB | **10.2 KB** |
+| React vendor (cached across deploys) | 221.7 KB | 68.9 KB |
+| CSS | 32.6 KB | 7.3 KB |
+| 7 lazy section chunks | 4–7 KB each | 1.5–2.7 KB each |
+
+- **Six of the eight plates are code-split.** Only the hero and the inventory are in the entry
+  bundle; the rest load behind `Suspense` with height-reserving fallbacks, so nothing shifts.
+- **`content-visibility: auto` on every plate**, so the browser skips layout and paint for
+  sections nowhere near the viewport. On a 30,000px page this is the single biggest win.
 - **No animation library.** All motion is CSS `transform` / `opacity` / `stroke-dashoffset`,
   which stays on the compositor. A scroll observer sets one attribute; CSS does the rest.
 - **No charting library.** Every figure is hand-authored inline SVG, so it inherits
   `currentColor` and re-inks itself in dark mode for free.
 - **Two-stage data loading.** `overview.json` is 14 KB and blocks first paint; `receipts.json`
   is 906 KB and loads after mount, with the sections that need it showing their own state.
+- **`ReceiptSlip` is memoised** — 60 render at once and every keystroke re-filters the list.
 - **The connection index binary-searches** its time window. A linear scan would be 3,704²
   comparisons on the main thread when building suggested anchors.
 - **Pooled IntersectionObserver** — one per config, not one per element.
+- **`useDeferredValue`** keeps the search input responsive while the filter pass runs.
+
+## Testing
+
+```bash
+npm run verify    # data → tests → self-check → typecheck → lint
+```
+
+| Command | Covers |
+|---|---|
+| `npm test` | 40 unit tests over `src/lib` — connection scoring, corpus ordering, formatting |
+| `npm run check` | 17 assertions over the generated bundles and the live connection index |
+| `npm run coverage` | V8 coverage over `src/lib` and `src/constants` |
+
+CI runs the whole sequence before publishing; a failure blocks the deploy.
 
 ## Accessibility
 

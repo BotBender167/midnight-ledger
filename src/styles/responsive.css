@@ -1,0 +1,160 @@
+/**
+ * Responsive behaviour that utility classes cannot express.
+ *
+ * The grid and type scale are handled by fluid `clamp()` tokens and Tailwind's
+ * breakpoint utilities. What lives here is everything those cannot reach:
+ * element-driven layout via container queries, device capability via pointer
+ * and hover queries, orientation, and print.
+ *
+ * Breakpoints mirror `constants/ui.ts` so JavaScript and CSS agree on where
+ * the layout changes.
+ */
+
+/* ── Offscreen work the browser can skip ─────────────────────────────────── */
+/* Each plate is a full screen of SVG and text. `content-visibility` lets the
+   browser skip layout and paint for the ones not near the viewport, which is
+   the single biggest win on a 30,000px page. `contain-intrinsic-size` supplies
+   a placeholder height so the scrollbar does not lurch as they resolve. */
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+/* The first two plates are always visible on load; skipping them would only
+   cost a paint. */
+header .section,
+#dig {
+  content-visibility: visible;
+}
+
+/* ── Container queries: slips respond to their column, not the viewport ──── */
+/* A receipt slip sits in a 1-, 2-, 3- or 4-column grid depending on breakpoint,
+   so viewport width tells it nothing useful about how much room it has. */
+.slip-grid {
+  container-type: inline-size;
+  container-name: slips;
+}
+
+@container slips (min-width: 30rem) {
+  .slip {
+    padding: 1rem 1.15rem;
+  }
+}
+
+/* ── Small phones ────────────────────────────────────────────────────────── */
+@media (max-width: 22.5rem) {
+  :root {
+    --space-gutter: 1rem;
+  }
+
+  .annotation {
+    letter-spacing: 0.12em;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+@media (max-width: 39.99rem) {
+  /* Tighten the editorial rhythm; full desktop spacing wastes a phone screen. */
+  .section {
+    padding-block: clamp(3.5rem, 2rem + 8vw, 5rem);
+  }
+
+  /* Charts authored for a wide plate need room to breathe, not to shrink. */
+  .figure-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .figure-scroll > svg {
+    min-width: 30rem;
+  }
+}
+
+/* ── Tablets ─────────────────────────────────────────────────────────────── */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .section {
+    padding-block: clamp(4.5rem, 3rem + 6vw, 7rem);
+  }
+}
+
+/* ── Landscape phones: vertical space is the scarce axis ─────────────────── */
+@media (max-height: 30rem) and (orientation: landscape) {
+  .section {
+    padding-block: 2.5rem;
+  }
+
+  /* The hero plate would otherwise fill the whole screen with no text. */
+  header svg {
+    max-height: 60vh;
+  }
+}
+
+/* ── Coarse pointers: fingertip-sized targets ────────────────────────────── */
+@media (pointer: coarse) {
+  .control {
+    min-height: 2.75rem;
+    padding-block: 0.7rem;
+  }
+
+  .slip {
+    min-height: 3rem;
+  }
+}
+
+/* ── Hover-capable devices only ──────────────────────────────────────────── */
+/* Without this, a tap on a touch device leaves the lifted hover state stuck. */
+@media (hover: none) {
+  .slip:hover {
+    transform: none;
+  }
+}
+
+/* ── Wide screens: stop the measure from getting unreadable ──────────────── */
+@media (min-width: 100rem) {
+  .shell {
+    max-width: 96rem;
+  }
+}
+
+/* ── High contrast ───────────────────────────────────────────────────────── */
+@media (prefers-contrast: more) {
+  .slip,
+  .control {
+    border-color: var(--color-ink);
+  }
+
+  .annotation {
+    color: var(--color-ink-2);
+  }
+}
+
+/* ── Print: the journal as an actual sheet of paper ──────────────────────── */
+@media print {
+  .skip-link,
+  nav,
+  .control,
+  input,
+  select {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  .section {
+    content-visibility: visible;
+    break-inside: avoid;
+    padding-block: 1.5rem;
+  }
+
+  a[href^="#"]::after {
+    content: "";
+  }
+}

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Receipt } from "../types/archive";
 import { KIND_COLOR, KIND_LABEL, clockTime, longDate, rupees } from "../lib/format";
 
@@ -15,7 +16,7 @@ type Props = {
  * Renders as a `button` whenever it is selectable, so keyboard and screen
  * reader users get the same affordance as a mouse — no div-with-onClick.
  */
-export function ReceiptSlip({ receipt, isSelected = false, onSelect, reason }: Props) {
+function ReceiptSlipImpl({ receipt, isSelected = false, onSelect, reason }: Props) {
   const interactive = typeof onSelect === "function";
   const Tag = interactive ? "button" : "div";
 
@@ -74,3 +75,11 @@ export function ReceiptSlip({ receipt, isSelected = false, onSelect, reason }: P
     </Tag>
   );
 }
+
+/**
+ * Sixty of these render at once in the archive, and every keystroke in the
+ * search box re-renders the list. Receipt objects come from the loaded array
+ * and are referentially stable, so memoising skips the rows whose data has not
+ * changed rather than rebuilding all sixty subtrees per filter pass.
+ */
+export const ReceiptSlip = memo(ReceiptSlipImpl);

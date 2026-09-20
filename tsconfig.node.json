@@ -1,0 +1,20 @@
+{
+  // Tests and build tooling. These run under Node, so they get the Node types
+  // the application config deliberately withholds. `src` is included so the
+  // modules under test resolve; the application config is still the one that
+  // enforces "no Node globals in shipped code".
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["node", "vite/client"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["src", "vite.config.ts", "vitest.config.ts"]
+}

@@ -30,8 +30,10 @@ jobs:
 
       # Regenerates public/data from the three CSVs in scripts/, then asserts
       # the invariants the UI depends on before anything is published.
+      # `npm test` covers both the unit tests and the generated-bundle
+      # integration checks, so there is no separate check step.
       - run: npm run data
-      - run: npm run check
+      - run: npm test
       - run: npm run typecheck
       - run: npm run lint
 

@@ -4,14 +4,7 @@ import { Reveal } from "../components/Reveal";
 import type { Overview } from "../types/archive";
 import { hourLabel, num, peak, peakIndex, shiftHours } from "../lib/format";
 
-/** Offsets worth naming. The archive itself is stamped UTC. */
-const ZONES = [
-  { offset: 0, label: "UTC", place: "as recorded" },
-  { offset: -5, label: "UTC−5", place: "US east coast" },
-  { offset: -8, label: "UTC−8", place: "US west coast" },
-  { offset: 1, label: "UTC+1", place: "Spain, central Europe" },
-  { offset: 5, label: "UTC+5½", place: "India" },
-] as const;
+import { TIMEZONE_PRESETS as ZONES } from "../constants/ui";
 
 /**
  * Read the shifted peak as a kind of life.

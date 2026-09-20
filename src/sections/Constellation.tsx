@@ -6,7 +6,7 @@ import { findConnections, findRichAnchors } from "../lib/connections";
 import type { Receipt } from "../types/archive";
 import { KIND_LABEL, longDate, num } from "../lib/format";
 
-const WINDOWS = [1, 3, 7, 14] as const;
+import { SUGGESTED_ANCHOR_COUNT, WINDOW_OPTIONS as WINDOWS } from "../constants";
 
 type Props = {
   receipts: Receipt[] | null;
@@ -27,7 +27,7 @@ export function Constellation({ receipts, isLoading }: Props) {
   const [trail, setTrail] = useState<Receipt[]>([]);
 
   const suggestions = useMemo(
-    () => (receipts ? findRichAnchors(receipts, 5) : []),
+    () => (receipts ? findRichAnchors(receipts, SUGGESTED_ANCHOR_COUNT) : []),
     [receipts],
   );
 
