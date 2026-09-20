@@ -137,6 +137,10 @@ export function findConnections(
 
     const delta = toTime(candidate.ts) - anchorTime;
     if (Number.isNaN(delta)) continue;
+    // The binary search already bracketed the window, but only correctly if the
+    // corpus is genuinely sorted by time. Re-check rather than trust it: a
+    // sorting regression should return fewer links, never wrong ones.
+    if (Math.abs(delta) > windowMs) continue;
 
     // Proximity decays linearly to zero at the window edge.
     const proximity = 1 - Math.abs(delta) / windowMs;

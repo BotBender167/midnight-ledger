@@ -116,10 +116,14 @@ npm run dev       # http://localhost:5173
 
 ```bash
 npm run build     # runs the data step, typechecks, then builds
+npm run verify    # data + self-check + typecheck + lint
+npm run check     # 17 assertions over the generated bundles and the connection engine
 npm run preview
-npm run lint
-npm run typecheck
 ```
+
+`npm run check` is not decoration — it caught a real bug where mixed `" "` and `"T"` timestamp
+separators made the lexical sort disagree with chronological order, silently breaking the
+binary-searched connection window. See [ARCHITECTURE.md](ARCHITECTURE.md#self-check).
 
 The three source CSVs live in `scripts/`. `npm run data` is wired into `npm run build`, so a
 clean clone produces a working site with one command.

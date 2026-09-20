@@ -28,7 +28,12 @@ export function readPlays(csvText) {
   return parseCSV(csvText)
     .filter((r) => r.ts && r.track_name && r.artist_name)
     .map((r) => ({
-      ts: r.ts,
+      // Normalise the separator to "T". The source uses a space, but derived
+      // moments below are emitted with "T", and " " sorts before "T" — mixing
+      // them makes a lexical sort disagree with chronological order for records
+      // on the same date, which silently breaks the binary-searched connection
+      // window downstream.
+      ts: r.ts.replace(" ", "T"),
       date: r.ts.slice(0, 10),
       year: r.ts.slice(0, 4),
       hour: Number(r.ts.slice(11, 13)),

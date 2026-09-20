@@ -6,8 +6,10 @@
   "description": "An illustrated field journal that reconstructs one anonymous life from 152,321 digital receipts.",
   "scripts": {
     "data": "node scripts/build-data.mjs",
+    "check": "node --experimental-strip-types scripts/selfcheck.mjs",
     "dev": "vite",
     "build": "npm run data && tsc -b && vite build",
+    "verify": "npm run data && npm run check && npm run typecheck && npm run lint",
     "preview": "vite preview",
     "lint": "eslint src --max-warnings 0",
     "typecheck": "tsc -b --noEmit"

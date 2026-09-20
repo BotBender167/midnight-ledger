@@ -130,10 +130,26 @@ Charts are the hard part. The approach:
 3. The radial clock additionally ships a visually hidden `<table>`. A dial is not readable
    however good its labels are, so the numbers are provided directly.
 
+## Self-check
+
+`npm run check` runs [`scripts/selfcheck.mjs`](scripts/selfcheck.mjs) — 17 assertions against
+the real generated bundles and the real connection engine, no test framework. It covers the two
+pieces of non-obvious logic: chapter detection and connection scoring.
+
+It has already earned its place. It caught a bug that nothing visible would have shown:
+
+> The corpus is sorted lexically, and `findConnections` binary-searches that order. But archive
+> A's timestamps arrived from the CSV with a **space** separator (`2017-03-04 02:11:00`) while
+> the moments derived from them were emitted with a **`T`**. Since `" "` sorts before `"T"`,
+> records on the same date interleaved out of chronological order, quietly violating the binary
+> search's precondition and letting out-of-window records into results.
+
+Fixed at the source by normalising the separator, plus a window re-check inside
+`findConnections` so a future sorting regression returns *fewer* links rather than wrong ones.
+
 ## What I would change with more than six hours
 
-- **Tests.** `connections.ts` and `eras.mjs` are pure and deserve unit tests. The scoring
-  weights in particular are asserted by eye right now.
+- **More tests.** The self-check covers invariants; the scoring *weights* are still tuned by eye.
 - **An index for the archive.** Linear search is fine at 3,704 rows and wrong at 50,000.
 - **Virtualised results.** The archive pages at 60 rather than windowing.
 - **Move era detection to runtime** so the reader could tune the thresholds and watch the
